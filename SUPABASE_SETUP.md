@@ -108,6 +108,7 @@ CREATE TABLE public.feedbacks (
     event text,
     rating integer,
     message text NOT NULL,
+    story text,
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

@@ -5,7 +5,7 @@
   --theme-secondary: #00e5ff;
   
   --bg-color: #f5f6fa;
-  --text-color: #ffffff; /* White text in light mode */
+  --text-color: #1a1a2e; /* Dark text in light mode */
   --text-shadow-3d: 0 2px 0 rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.18); /* 3D depth */
   --header-bg: rgba(255, 255, 255, 0.2);
   --card-bg: rgba(255, 255, 255, 0.2);
@@ -146,10 +146,10 @@ body {
 }
 
 * { box-sizing: border-box; }
-a { color: white; text-decoration: none; transition: color 0.3s; }
-a:hover { color: rgba(255,255,255,0.7); }
-[data-theme='dark'] a { color: var(--theme-primary); }
-[data-theme='dark'] a:hover { color: #005bb5; }
+a { color: var(--text-color); text-decoration: none; transition: color 0.3s; }
+a:hover { color: var(--theme-primary); }
+[data-theme='dark'] a { color: var(--theme-secondary); }
+[data-theme='dark'] a:hover { color: var(--theme-primary); }
 
 /* Global 3D text effect in light mode */
 body:not([data-theme='dark']) h1,

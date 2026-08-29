@@ -438,9 +438,7 @@ export default function AdminDashboard() {
                   <Button icon={<UploadOutlined />}>Select Cover PDF</Button>
                 </Upload>
               </Form.Item>
-              <Form.Item name="cover_pdf" label={<span style={{ color: 'var(--text-color)' }}>Cover PDF Link (Optional)</span>}>
-                <Input placeholder="e.g. https://example.com/cover.pdf" />
-              </Form.Item>
+
               <Form.Item label={<span style={{ color: 'var(--text-color)' }}>Upload Magazine PDF (Optional)</span>}>
                 <Upload
                   accept=".pdf"
@@ -453,9 +451,7 @@ export default function AdminDashboard() {
                   <Button icon={<UploadOutlined />}>Select Magazine PDF</Button>
                 </Upload>
               </Form.Item>
-              <Form.Item name="magazine_pdf" label={<span style={{ color: 'var(--text-color)' }}>Magazine PDF Link (Optional)</span>}>
-                <Input placeholder="e.g. https://example.com/magazine.pdf" />
-              </Form.Item>
+
             </>
           )}
 
@@ -482,9 +478,7 @@ export default function AdminDashboard() {
                   <Button icon={<UploadOutlined />}>Select PDF</Button>
                 </Upload>
               </Form.Item>
-              <Form.Item name="pdf_file" label={<span style={{ color: 'var(--text-color)' }}>PDF Link (Optional)</span>}>
-                <Input placeholder="e.g. https://example.com/word.pdf" />
-              </Form.Item>
+
             </>
           )}
 

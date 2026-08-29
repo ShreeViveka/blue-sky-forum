@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Typography, Form, Input, Select, Button, Rate, message, Card, Row, Col, Empty } from 'antd';
+import { Typography, Form, Input, Select, Button, Rate, message, Card, Row, Col, Empty, Popconfirm } from 'antd';
 import { motion } from 'framer-motion';
-import { SendOutlined, HeartOutlined } from '@ant-design/icons';
+import { SendOutlined, HeartOutlined, DeleteOutlined } from '@ant-design/icons';
 import { api } from '../lib/api';
 
 const { Title, Paragraph } = Typography;
@@ -31,7 +31,6 @@ export default function FeedbacksPage() {
   const [authChecked, setAuthChecked] = useState(false);
 
   const loadFeedbacks = async () => {
-    if (!isAdmin) return;
     try {
       setFetching(true);
       const data = await api.getFeedbacks();
@@ -40,6 +39,17 @@ export default function FeedbacksPage() {
       console.error('Feedback load error:', error);
     } finally {
       setFetching(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.deleteFeedback(id);
+      message.success('Feedback deleted successfully');
+      loadFeedbacks();
+    } catch (error) {
+      console.error('Failed to delete feedback:', error);
+      message.error('Failed to delete feedback');
     }
   };
 
@@ -58,7 +68,7 @@ export default function FeedbacksPage() {
   }, []);
 
   useEffect(() => {
-    if (authChecked && isAdmin) {
+    if (authChecked) {
       loadFeedbacks();
     }
   }, [authChecked, isAdmin]);
@@ -70,9 +80,7 @@ export default function FeedbacksPage() {
       setSubmitted(true);
       form.resetFields();
       message.success('Thank you for your feedback!');
-      if (isAdmin) {
-        await loadFeedbacks();
-      }
+      await loadFeedbacks();
     } catch (error) {
       console.error('Feedback submit error:', error);
       message.error(error?.message || 'Unable to submit feedback. Please try again later.');
@@ -166,6 +174,10 @@ export default function FeedbacksPage() {
                   <TextArea rows={5} placeholder="Tell us how Blue Sky Forum helped you, what you loved, or any suggestions..." style={{ borderRadius: 12, fontSize: '1rem', background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.5)', color: 'white' }} />
                 </Form.Item>
 
+                <Form.Item name="story" label={<span style={{ color: 'white', fontWeight: 600, textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>Share Your Story</span>} style={{ pointerEvents: 'auto' }}>
+                  <TextArea rows={4} placeholder="Share a story that connected with you..." style={{ borderRadius: 12, fontSize: '1rem', background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.5)', color: 'white' }} />
+                </Form.Item>
+
                 <Form.Item style={{ marginBottom: 0 }}>
                   <Button
                     type="primary"
@@ -186,44 +198,86 @@ export default function FeedbacksPage() {
       </div>
 
       <div style={{ maxWidth: '960px', margin: '0 auto', padding: '0 20px 80px' }}>
-        <Title level={2} style={{ color: 'white', marginBottom: 24, textAlign: 'center' }}>Community Feedback</Title>
         {authChecked ? (
           isAdmin ? (
-            feedbacks.length === 0 && !fetching ? (
-              <Empty description="No feedback submitted yet" style={{ color: 'white', padding: '80px 0' }} />
-            ) : (
-              <Row gutter={[24, 24]}>
-                {feedbacks.map((item) => (
-                  <Col xs={24} sm={12} key={item.id}>
-                    <Card
-                      bordered={false}
-                      style={{ borderRadius: 24, background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(14px)' }}
-                      bodyStyle={{ color: 'white' }}
-                    >
-                      <Title level={4} style={{ color: 'white', marginBottom: 8 }}>{item.name}</Title>
-                      <Paragraph style={{ color: 'rgba(255,255,255,0.85)', marginBottom: 8 }}>{item.message}</Paragraph>
-                      <Paragraph type="secondary" style={{ color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>
-                        {item.year} • {item.department}
-                      </Paragraph>
-                      {item.event && (
-                        <Paragraph style={{ color: 'rgba(255,255,255,0.65)', marginBottom: 4 }}>Enjoyed: {item.event}</Paragraph>
-                      )}
-                      {item.rating != null && (
-                        <Paragraph style={{ color: 'rgba(255,255,255,0.65)' }}>Rating: {item.rating}/5</Paragraph>
-                      )}
-                    </Card>
-                  </Col>
-                ))}
-              </Row>
-            )
+            <>
+              <Title level={2} style={{ color: 'white', marginBottom: 24, textAlign: 'center' }}>Community Feedback (Admin View)</Title>
+              {feedbacks.length === 0 && !fetching ? (
+                <Empty description="No feedback submitted yet" style={{ color: 'white', padding: '80px 0' }} />
+              ) : (
+                <Row gutter={[24, 24]}>
+                  {feedbacks.map((item) => (
+                    <Col xs={24} sm={12} key={item.id}>
+                      <Card
+                        bordered={false}
+                        style={{ borderRadius: 24, background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(14px)' }}
+                        bodyStyle={{ color: 'white' }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <Title level={4} style={{ color: 'white', marginBottom: 8 }}>{item.name}</Title>
+                          <Popconfirm
+                            title="Delete this feedback?"
+                            description="Are you sure you want to delete this feedback?"
+                            onConfirm={() => handleDelete(item.id)}
+                            okText="Yes"
+                            cancelText="No"
+                            okButtonProps={{ danger: true }}
+                          >
+                            <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+                          </Popconfirm>
+                        </div>
+                        <Paragraph style={{ color: 'rgba(255,255,255,0.85)', marginBottom: 8 }}>{item.message}</Paragraph>
+                        <Paragraph type="secondary" style={{ color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>
+                          {item.year} • {item.department}
+                        </Paragraph>
+                        {item.event && (
+                          <Paragraph style={{ color: 'rgba(255,255,255,0.65)', marginBottom: 4 }}>Enjoyed: {item.event}</Paragraph>
+                        )}
+                        {item.story && (
+                          <Paragraph style={{ color: 'rgba(255,255,255,0.7)', fontStyle: 'italic', marginBottom: 4 }}>
+                            "{item.story}"
+                          </Paragraph>
+                        )}
+                        {item.rating != null && (
+                          <Paragraph style={{ color: 'rgba(255,255,255,0.65)' }}>Rating: {item.rating}/5</Paragraph>
+                        )}
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              )}
+            </>
           ) : (
-            <Paragraph style={{ color: 'rgba(255,255,255,0.75)', textAlign: 'center', padding: '80px 0' }}>
-              Feedback list is visible only to signed-in admins.
-            </Paragraph>
+            <>
+              <Title level={2} style={{ color: 'white', marginBottom: 24, textAlign: 'center' }}>Community Stories</Title>
+              {feedbacks.filter(f => f.story && f.story.trim() !== '').length === 0 && !fetching ? (
+                <Empty description="No stories shared yet. Be the first!" style={{ color: 'white', padding: '80px 0' }} />
+              ) : (
+                <Row gutter={[24, 24]}>
+                  {feedbacks.filter(f => f.story && f.story.trim() !== '').map((item) => (
+                    <Col xs={24} sm={12} key={item.id}>
+                      <Card
+                        bordered={false}
+                        style={{ borderRadius: 24, background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(14px)' }}
+                        bodyStyle={{ color: 'white' }}
+                      >
+                        <Title level={4} style={{ color: 'white', marginBottom: 8 }}>{item.name}</Title>
+                        <Paragraph style={{ color: 'rgba(255,255,255,0.9)', fontStyle: 'italic', marginBottom: 16, fontSize: '1.1rem' }}>
+                          "{item.story}"
+                        </Paragraph>
+                        <Paragraph type="secondary" style={{ color: 'rgba(255,255,255,0.6)', marginBottom: 0 }}>
+                          {item.year} • {item.department}
+                        </Paragraph>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              )}
+            </>
           )
         ) : (
           <Paragraph style={{ color: 'rgba(255,255,255,0.75)', textAlign: 'center', padding: '80px 0' }}>
-            Checking authentication status...
+            Loading...
           </Paragraph>
         )}
       </div>

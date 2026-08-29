@@ -156,6 +156,14 @@ export const api = {
     if (error) throw error;
     return data || [];
   },
+  deleteFeedback: async (id) => {
+    const { error } = await supabase
+      .from('feedbacks')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+    return true;
+  },
 
   // Thoughts (singleton)
   getThought: async () => {

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VIiTE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VIiTE_SUPABASE_ANON_KEY;
 
 // Using a mock valid JWT structure for fallback to prevent client library validation crashes
 const dummyJwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSJ9.dummy';
